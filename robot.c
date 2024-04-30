@@ -10,16 +10,19 @@ const int directions[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
 // Função para imprimir a matriz com o robô
 void printMatrixWithRobot(int matrix[SIZE][SIZE], int x, int y) {
-    system("cls");
+    // system("clear") // Ativar caso esteja usando linux ou compilador online
+    system("cls"); // Faz com que não se acumulem matrizes no terminal
     printf("Matriz:\n");
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (i == x && j == y) {
                 printf("?[ ? ]?"); // Representação do robô
             } else if (matrix[i][j] == 0) {
-                printf("|....| ");
+                printf("|....| "); // Representação padrão da matriz
+            } else if (matrix[i][j] == 1) {
+                printf("|@@@@| "); // Sujeira
             } else {
-                printf("|@@@@| ");
+                printf("|----| "); // Sujeira limpa
             }
         }
         printf("\n");
@@ -104,7 +107,7 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     }
     
     // Marca a sujeira como limpa
-    matrix[targetX][targetY] = 0;
+    matrix[targetX][targetY] = -1; // Marca como sujeira limpa
     
     printf("Sujeira limpa!\n");
     printMatrixWithRobot(matrix, x, y); // Exibe a matriz com o robô
@@ -156,7 +159,7 @@ int main() {
         printMatrixWithRobot(matrix, 0, 0); // O robô começa na posição (0, 0)
     }
     
-// Definição do local de partida do robô
+    // Definição do local de partida do robô
     int startX, startY;
     printf("Digite a linha de partida do robô: ");
     scanf("%d", &startX);
