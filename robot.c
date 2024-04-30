@@ -12,11 +12,11 @@ const int directions[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 void printMatrixWithRobot(int matrix[SIZE][SIZE], int x, int y) {
     // system("clear") // Ativar caso esteja usando linux ou compilador online
     system("cls"); // Faz com que não se acumulem matrizes no terminal
-    printf("Matriz:\n");
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (i == x && j == y) {
-                printf("?[ ? ]?"); // Representação do robô
+                // printf("?[ ? ]?"); // Representação do robô
+                printf("[o_0]b "); // Caso a representação do robô padrão de erro, utilize essa
             } else if (matrix[i][j] == 0) {
                 printf("|....| "); // Representação padrão da matriz
             } else if (matrix[i][j] == 1) {
@@ -61,63 +61,69 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     int x = startX;
     int y = startY;
     
-    // Encontra a sujeira mais próxima
-    int targetX = -1, targetY = -1;
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            if (matrix[i][j] == 1) {
-                targetX = i;
-                targetY = j;
-                break;
-            }
-        }
-        if (targetX != -1)
-            break;
-    }
-    
-    if (targetX == -1) {
-        printf("Não há sujeira para limpar.\n");
-        return;
-    }
-    
-    while (x != targetX || y != targetY) {
-        int nextX = x, nextY = y;
-        int minDistance = SIZE * SIZE; // Valor inicial grande
+    // Loop principal para limpar todas as sujeiras do ambiente
+    while (1) {
+        int targetX = -1, targetY = -1;
         
-        // Itera sobre as direções para encontrar a direção com a menor distância para a sujeira
-        for (int i = 0; i < 4; i++) {
-            int newX = x + directions[i][0];
-            int newY = y + directions[i][1];
-            
-            // Verifica se o movimento é válido e se está mais próximo da sujeira
-            if (isValidMove(newX, newY) && matrix[newX][newY] == 1) {
-                int distance = abs(newX - targetX) + abs(newY - targetY);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nextX = newX;
-                    nextY = newY;
+        // Encontra a sujeira mais próxima
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (matrix[i][j] == 1) {
+                    targetX = i;
+                    targetY = j;
+                    break;
                 }
             }
+            if (targetX != -1)
+                break;
         }
         
-        // Move o robô para a próxima posição mais próxima da sujeira
-        moveRobot(matrix, &x, &y, nextX - x, nextY - y);
-        printf("Movendo para (%d, %d)\n", x, y);
+        // Verifica se há sujeira para limpar
+        if (targetX == -1) {
+            printf("Todas as sujeiras foram limpas.\n");
+            break;
+        }
+        
+        // Movimento do robô para limpar a sujeira mais próxima
+        while (x != targetX || y != targetY) {
+            int nextX = x, nextY = y;
+            int minDistance = SIZE * SIZE; // Valor inicial grande
+
+            // Itera sobre as direções para encontrar a direção com a menor distância para a sujeira
+            for (int i = 0; i < 4; i++) {
+                int newX = x + directions[i][0];
+                int newY = y + directions[i][1];
+
+                // Verifica se o movimento é válido e se está mais próximo da sujeira
+                if (isValidMove(newX, newY) && matrix[newX][newY] == 1) {
+                    int distance = abs(newX - targetX) + abs(newY - targetY);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nextX = newX;
+                        nextY = newY;
+                    }
+                }
+            }
+
+            // Move o robô para a próxima posição mais próxima da sujeira
+            moveRobot(matrix, &x, &y, nextX - x, nextY - y);
+            printf("Movendo para (%d, %d)\n", x, y);
+            printMatrixWithRobot(matrix, x, y); // Exibe a matriz com o robô
+        }
+
+        // Marca a sujeira como limpa
+        matrix[targetX][targetY] = -1; // Marca como sujeira limpa
+
+        printf("Sujeira limpa!\n");
         printMatrixWithRobot(matrix, x, y); // Exibe a matriz com o robô
     }
-    
-    // Marca a sujeira como limpa
-    matrix[targetX][targetY] = -1; // Marca como sujeira limpa
-    
-    printf("Sujeira limpa!\n");
-    printMatrixWithRobot(matrix, x, y); // Exibe a matriz com o robô
     
     // Movendo o robô de volta à estação de partida
     while (x != startX || y != startY) {
         // Encontra a direção oposta àquela que o robô está indo
         int dirX = startX - x;
         int dirY = startY - y;
-        
+
         // Move o robô para a direção oposta
         moveRobot(matrix, &x, &y, dirX, dirY);
         printf("Retornando para a estação de partida (%d, %d)\n", x, y);
