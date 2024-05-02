@@ -5,12 +5,30 @@
 
 #define SIZE 8
 
+// Cores para destacar o robô e outros componentes no terminal
+void white() {
+    printf("\033[0;37m");
+}
+
+void red() {
+    printf("\033[1;31m");
+}
+
+void purple() {
+    printf("\033[0;35m");
+}
+
+void green() {
+    printf("\033[0;32m");
+}
+
 // Função para imprimir a matriz vazia
 void printEmptyMatrix() {
     // system("clear") // Ativar caso esteja usando linux ou compilador online
     system("cls"); // Faz com que não se acumulem matrizes no terminal
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
+            white();
             printf("|----| ");
         }
         printf("\n");
@@ -28,12 +46,16 @@ void printMatrixWithRobot(int matrix[SIZE][SIZE], int x, int y) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (i == x && j == y) {
+                red();
                 printf("[o_0]b "); // Mostra o robô na posição definida
             } else if (matrix[i][j] == 0) {
+                white();
                 printf("|----| "); // Representação padrão da matriz
             } else if (matrix[i][j] == 1) {
+                green();
                 printf("|@@@@| "); // Sujeira
             } else {
+                purple();
                 printf("|    | "); // Sujeira limpa
             }
         }
@@ -203,3 +225,5 @@ int main() {
     
     return 0;
 }
+
+// feito por: _a5ur4
