@@ -33,6 +33,8 @@ void printEmptyMatrix() {
         }
         printf("\n");
     }
+    printf("\nFeito por: _a5ur4");
+    printf("\n");
 }
 
 // Definição das direções prioritárias
@@ -83,15 +85,16 @@ int checkDirection(int matrix[SIZE][SIZE], int x, int y, int dirX, int dirY) {
 
 // Função para mover o robô na direção prioritária
 void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY) {
+    // Move o robô
     *x += dirX;
     *y += dirY;
-    
-    // Marca o local como limpo
-    matrix[*x][*y] = 0;
-    
+
+    // Marca a posição atual como limpa
+    matrix[*x][*y] = -1;
+
     // Exibe a matriz com o robô após o movimento
     printMatrixWithRobot(matrix, *x, *y);
-    
+
     // Aguarda 1 segundo antes do próximo movimento
     sleep(1);
 }
@@ -100,14 +103,14 @@ void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY) {
 void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     int x = startX;
     int y = startY;
-    
+
     // Exibe a matriz inicial com o robô na posição de partida
     printMatrixWithRobot(matrix, x, y);
-    
+
     // Loop principal para limpar todas as sujeiras do ambiente
     while (1) {
         int targetX = -1, targetY = -1;
-        
+
         // Encontra a sujeira mais próxima
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -120,13 +123,13 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
             if (targetX != -1)
                 break;
         }
-        
+
         // Verifica se há sujeira para limpar
         if (targetX == -1) {
             printf("Todas as sujeiras foram limpas.\n");
             break;
         }
-        
+
         // Movimento do robô para limpar a sujeira mais próxima
         while (x != targetX || y != targetY) {
             int nextX = x, nextY = y;
@@ -157,7 +160,7 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
 
         printf("Sujeira limpa!\n");
     }
-    
+
     // Movendo o robô de volta à estação de partida
     while (x != startX || y != startY) {
         // Encontra a direção oposta àquela que o robô está indo
@@ -173,56 +176,56 @@ int main() {
     setlocale(LC_ALL, "Portuguese");
     int matrix[SIZE][SIZE] = {0}; // Inicializa a matriz com zeros (lugares limpos)
     int dirtyX, dirtyY;
-    
+
     // Exibe a matriz vazia
     printEmptyMatrix();
-    
+
     // Definição do local de partida do robô
     int startX, startY;
     printf("\nDigite a linha de partida do robo: ");
     scanf("%d", &startX);
-    
+
     printf("Digite a coluna de partida do robo: ");
     scanf("%d", &startY);
-    
+
     // Validação das coordenadas de partida
     if (!isValidMove(startX, startY)) {
         printf("Coordenadas inválidas.\n");
         return 1;
     }
-    
+
     // Exibe a matriz com o robô na posição de partida
     printMatrixWithRobot(matrix, startX, startY);
-    
+
     // Loop para adicionar sujeira
     while (1) {
         // Solicita as coordenadas da sujeira ao usuário
         printf("\nDigite a linha da sujeira ou -1 para iniciar a limpeza: ");
         scanf("%d", &dirtyX);
-        
+
         // Verifica se o usuário deseja encerrar
         if (dirtyX == -1)
             break;
-        
+
         printf("Digite a coluna da sujeira: ");
         scanf("%d", &dirtyY);
-        
+
         // Verifica se as coordenadas são válidas
         if (dirtyX < 0 || dirtyX >= SIZE || dirtyY < 0 || dirtyY >= SIZE) {
             printf("Coordenadas inválidas.\n");
             continue;
         }
-        
+
         // Coloca sujeira na posição especificada
         matrix[dirtyX][dirtyY] = 1;
-        
+
         // Exibe a matriz atualizada com a sujeira adicionada
         printMatrixWithRobot(matrix, startX, startY);
     }
-    
+
     // Inicia a limpeza do ambiente a partir da estação de partida
     cleanEnvironment(matrix, startX, startY);
-    
+
     return 0;
 }
 
