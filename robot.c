@@ -99,6 +99,19 @@ void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY) {
     sleep(1);
 }
 
+// Função para mover o robô de volta para sua posição inicial
+void returnToStart(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY) {
+    // Movimento do robô de volta para a posição inicial
+    while (*x != startX || *y != startY) {
+        // Encontra a direção para a posição inicial
+        int dirX = (startX - *x) > 0 ? 1 : ((startX - *x) < 0 ? -1 : 0);
+        int dirY = (startY - *y) > 0 ? 1 : ((startY - *y) < 0 ? -1 : 0);
+
+        // Move o robô para a próxima posição em direção à posição inicial
+        moveRobot(matrix, x, y, dirX, dirY);
+    }
+}
+
 // Função para limpar todo o ambiente e retornar à estação de partida
 void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     int x = startX;
@@ -162,14 +175,7 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     }
 
     // Movendo o robô de volta à estação de partida
-    while (x != startX || y != startY) {
-        // Encontra a direção oposta àquela que o robô está indo
-        int dirX = startX - x;
-        int dirY = startY - y;
-
-        // Move o robô para a direção oposta
-        moveRobot(matrix, &x, &y, dirX, dirY);
-    }
+    returnToStart(matrix, &x, &y, startX, startY);
 }
 
 int main() {
@@ -228,5 +234,3 @@ int main() {
 
     return 0;
 }
-
-// feito por: _a5ur4
