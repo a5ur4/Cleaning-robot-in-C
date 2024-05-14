@@ -22,6 +22,10 @@ void green() {
     printf("\033[0;32m");
 }
 
+void yellow() {
+    printf("\033[1;33m");
+}
+
 // Função para imprimir a matriz vazia
 void printEmptyMatrix() {
     // system("clear") // Ativar caso esteja usando linux ou compilador online
@@ -41,13 +45,16 @@ void printEmptyMatrix() {
 const int directions[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 // Ordem: cima, baixo, esquerda, direita
 
-// Função para imprimir a matriz com o robô
-void printMatrixWithRobot(int matrix[SIZE][SIZE], int x, int y) {
+// Função para imprimir a matriz com o robô e o ponto de partida
+void printMatrixWithRobot(int matrix[SIZE][SIZE], int x, int y, int startX, int startY) {
     // system("clear") // Ativar caso esteja usando linux ou compilador online
     system("cls"); // Faz com que não se acumulem matrizes no terminal
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            if (i == x && j == y) {
+            if (i == startX && j == startY) {
+                yellow();
+                printf("[ ES ] "); // Marcador do ponto de partida
+            } else if (i == x && j == y) {
                 red();
                 printf("[o_0]b "); // Mostra o robô na posição definida
             } else if (matrix[i][j] == 0) {
@@ -84,7 +91,7 @@ int checkDirection(int matrix[SIZE][SIZE], int x, int y, int dirX, int dirY) {
 }
 
 // Função para mover o robô na direção prioritária
-void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY) {
+void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY, int startX, int startY) {
     // Move o robô
     *x += dirX;
     *y += dirY;
@@ -93,11 +100,12 @@ void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY) {
     matrix[*x][*y] = -1;
 
     // Exibe a matriz com o robô após o movimento
-    printMatrixWithRobot(matrix, *x, *y);
+    printMatrixWithRobot(matrix, *x, *y, startX, startY);
 
     // Aguarda 1 segundo antes do próximo movimento
     sleep(1);
 }
+
 
 // Função para mover o robô de volta para sua posição inicial
 void returnToStart(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY) {
@@ -108,7 +116,7 @@ void returnToStart(int matrix[SIZE][SIZE], int *x, int *y, int startX, int start
         int dirY = (startY - *y) > 0 ? 1 : ((startY - *y) < 0 ? -1 : 0);
 
         // Move o robô para a próxima posição em direção à posição inicial
-        moveRobot(matrix, x, y, dirX, dirY);
+        moveRobot(matrix, x, y, dirX, dirY, startX, startY);
     }
 }
 
@@ -118,7 +126,7 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     int y = startY;
 
     // Exibe a matriz inicial com o robô na posição de partida
-    printMatrixWithRobot(matrix, x, y);
+    printMatrixWithRobot(matrix, x, y, startX, startY);
 
     // Loop principal para limpar todas as sujeiras do ambiente
     while (1) {
@@ -165,7 +173,7 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
             }
 
             // Move o robô para a próxima posição mais próxima da sujeira
-            moveRobot(matrix, &x, &y, nextX - x, nextY - y);
+            moveRobot(matrix, &x, &y, nextX - x, nextY - y, startX, startY);
         }
 
         // Marca a sujeira como limpa
@@ -201,7 +209,7 @@ int main() {
     }
 
     // Exibe a matriz com o robô na posição de partida
-    printMatrixWithRobot(matrix, startX, startY);
+    printMatrixWithRobot(matrix, startX, startY, startX, startY);
 
     // Loop para adicionar sujeira
     while (1) {
@@ -226,7 +234,7 @@ int main() {
         matrix[dirtyX][dirtyY] = 1;
 
         // Exibe a matriz atualizada com a sujeira adicionada
-        printMatrixWithRobot(matrix, startX, startY);
+        printMatrixWithRobot(matrix, startX, startY, startX, startY);
     }
 
     // Inicia a limpeza do ambiente a partir da estação de partida
@@ -234,3 +242,5 @@ int main() {
 
     return 0;
 }
+
+// Feito por: _a5ur4
