@@ -106,17 +106,47 @@ void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY, int s
     sleep(1);
 }
 
+// Função para mover o robô de volta para sua posição inicial, seguindo o caminho inverso
+void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY) {
+    int prevX = -1, prevY = -1; // Armazena a posição anterior do robô
 
-// Função para mover o robô de volta para sua posição inicial
-void returnToStart(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY) {
     // Movimento do robô de volta para a posição inicial
     while (*x != startX || *y != startY) {
+        // Marca a posição anterior como visitada
+        matrix[*x][*y] = -2;
+
         // Encontra a direção para a posição inicial
-        int dirX = (startX - *x) > 0 ? 1 : ((startX - *x) < 0 ? -1 : 0);
-        int dirY = (startY - *y) > 0 ? 1 : ((startY - *y) < 0 ? -1 : 0);
+        int dirX = (*x < startX) ? 1 : (*x > startX) ? -1 : 0;
+        int dirY = (*y < startY) ? 1 : (*y > startY) ? -1 : 0;
+
+        // Armazena a posição atual como anterior
+        prevX = *x;
+        prevY = *y;
 
         // Move o robô para a próxima posição em direção à posição inicial
-        moveRobot(matrix, x, y, dirX, dirY, startX, startY);
+        if (dirX != 0) {
+            if (isValidMove(*x + dirX, *y) && matrix[*x + dirX][*y] == -1) {
+                *x += dirX;
+            } else if (isValidMove(*x, *y + 1) && matrix[*x][*y + 1] == -1) {
+                *y += 1;
+            } else if (isValidMove(*x, *y - 1) && matrix[*x][*y - 1] == -1) {
+                *y -= 1;
+            }
+        } else if (dirY != 0) {
+            if (isValidMove(*x, *y + dirY) && matrix[*x][*y + dirY] == -1) {
+                *y += dirY;
+            } else if (isValidMove(*x + 1, *y) && matrix[*x + 1][*y] == -1) {
+                *x += 1;
+            } else if (isValidMove(*x - 1, *y) && matrix[*x - 1][*y] == -1) {
+                *x -= 1;
+            }
+        }
+
+        // Exibe a matriz com o robô após o movimento
+        printMatrixWithRobot(matrix, *x, *y, startX, startY);
+
+        // Aguarda 1 segundo antes do próximo movimento
+        sleep(1);
     }
 }
 
@@ -182,8 +212,8 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
         printf("Sujeira limpa!\n");
     }
 
-    // Movendo o robô de volta à estação de partida
-    returnToStart(matrix, &x, &y, startX, startY);
+    // Movendo o robô de volta à estação de partida seguindo o caminho inverso
+    moonWalker(matrix, &x, &y, startX, startY);
 }
 
 int main() {
@@ -207,6 +237,9 @@ int main() {
         printf("Coordenadas inválidas.\n");
         return 1;
     }
+
+    // Definição da estação com o mesmo valor que uma área limpa (-1)
+    matrix[startX][startY] = -1;
 
     // Exibe a matriz com o robô na posição de partida
     printMatrixWithRobot(matrix, startX, startY, startX, startY);
