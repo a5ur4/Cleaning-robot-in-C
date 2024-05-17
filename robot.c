@@ -221,24 +221,24 @@ int main() {
     int matrix[SIZE][SIZE] = {0}; // Inicializa a matriz com zeros (lugares limpos)
     int dirtyX, dirtyY;
 
-    // Exibe a matriz vazia
-    printEmptyMatrix();
-
     // Definição do local de partida do robô
     int startX, startY;
-    printf("\nDigite a linha de partida do robo: ");
-    scanf("%d", &startX);
+    
+    // Definição e validação da posição inicial do robô, isso torna tudo um pouco mais lento, mas é a solução que consegui por agora
+    while (startX && startY > SIZE)
+    {
+        system("cls");
 
-    printf("Digite a coluna de partida do robo: ");
-    scanf("%d", &startY);
+        printEmptyMatrix(); // Imprime a matriz vazia
 
-    // Validação das coordenadas de partida
-    if (!isValidMove(startX, startY)) {
-        printf("Coordenadas inválidas.\n");
-        return 1;
+        printf("\nDigite a linha de partida do robo: ");
+        scanf("%d", &startX);
+
+        printf("Digite a coluna de partida do robo: ");
+        scanf("%d", &startY);
     }
 
-    // Definição da estação com o mesmo valor que uma área limpa (-1)
+    // Definição da estação com o mesmo valor que uma área limpa (-1), se tirar isso daqui quebra tudo
     matrix[startX][startY] = -1;
 
     // Exibe a matriz com o robô na posição de partida
