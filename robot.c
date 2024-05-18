@@ -225,7 +225,7 @@ int main() {
     int startX, startY;
     
     // Definição e validação da posição inicial do robô, isso torna tudo um pouco mais lento, mas é a solução que consegui por agora
-    while (startX && startY > SIZE)
+    while (startX > SIZE || startY > SIZE)
     {
         system("cls");
 
