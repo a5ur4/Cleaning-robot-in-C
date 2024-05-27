@@ -2,7 +2,7 @@
 
 ## Descrição do Projeto
 
-Este projeto implementa um robô de limpeza simulado em C, que se move em uma matriz 8x8, limpa sujeiras especificadas pelo usuário e retorna à sua posição inicial após a limpeza. O robô evita passar por locais não acessíveis representados por "|----|".
+Este projeto implementa um robô de limpeza simulado em C, que se move em uma matriz 8x8, limpa sujeiras especificadas pelo usuário e retorna à sua posição inicial após a limpeza. O robô evita passar por locais inacessíveis representados por "|----|".
 
 ## Funcionalidades
 
@@ -10,7 +10,7 @@ Este projeto implementa um robô de limpeza simulado em C, que se move em uma ma
 - Definição da posição inicial do robô pelo usuário.
 - Adição de sujeiras em posições especificadas pelo usuário.
 - Movimento do robô para limpar todas as sujeiras na matriz.
-- Retorno do robô à posição inicial após a limpeza.
+- Retorno do robô à posição inicial após a limpeza utilizando o algoritmo A* (implementado na função `oppenhaimer`).
 - Visualização da matriz no terminal, com diferentes cores representando o robô, a sujeira, áreas limpas e a posição inicial.
 
 ## Requisitos
@@ -45,7 +45,7 @@ Após a compilação, execute o programa:
 3. O usuário pode adicionar sujeiras especificando as coordenadas (linha e coluna).
 4. Após adicionar todas as sujeiras, o usuário pode iniciar a limpeza digitando `-1` como coordenada de linha.
 5. O robô se move pela matriz limpando as sujeiras, evitando locais inacessíveis representados por "|----|".
-6. Após limpar todas as sujeiras, o robô retorna à posição inicial.
+6. Após limpar todas as sujeiras, o robô retorna à posição inicial utilizando o algoritmo A* (implementado na função `oppenhaimer`) para encontrar o caminho mais curto.
 7. A cada movimento, a matriz é exibida no terminal, mostrando a posição atual do robô e as áreas limpas.
 
 ## Estrutura do Código
@@ -56,6 +56,7 @@ Após a compilação, execute o programa:
 - `#include <stdlib.h>`: Para a função `system()`.
 - `#include <locale.h>`: Para configurações de localidade.
 - `#include <unistd.h>`: Para a função `sleep()`.
+- `#include <math.h>`: Para funções matemáticas.
 - `#define SIZE 8`: Define o tamanho da matriz.
 
 ### Funções de Cor
@@ -68,16 +69,27 @@ Funções para definir cores no terminal:
 - `void green()`
 - `void yellow()`
 
-### Funções de Impressão
+### Função de Impressão
 
-- `void printEmptyMatrix()`: Imprime a matriz vazia.
-- `void printMatrixWithRobot(int matrix[SIZE][SIZE], int x, int y, int startX, int startY)`: Imprime a matriz com o robô, sujeira e áreas limpas.
+- `void printMatrix(int matrix[SIZE][SIZE], int x, int y, int startX, int startY)`: Imprime a matriz com o robô, sujeira e áreas limpas.
 
 ### Funções de Movimento e Verificação
 
 - `int isValidMove(int x, int y)`: Verifica se o movimento é válido dentro da matriz.
 - `void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY, int startX, int startY)`: Move o robô em uma direção específica e atualiza a matriz.
-- `void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY)`: Move o robô de volta à posição inicial.
+- `void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY)`: Move o robô de volta à posição inicial usando o algoritmo A* (implementado na função `oppenhaimer`).
+
+### Estruturas e Funções do Algoritmo A*
+
+- **Estrutura `Node`**: Representa uma posição na matriz, usada para a navegação e cálculo do caminho.
+  ```c
+  typedef struct {
+      int x, y; // Coordenadas do nó na matriz
+      int g, h, f; // Custos usados na heurística
+  } Node;
+  ```
+- `int heuristic(int x1, int y1, int x2, int y2)`: Calcula a heurística (distância de Manhattan) entre dois pontos.
+- `void oppenhaimer(int matrix[SIZE][SIZE], int startX, int startY, int goalX, int goalY, int *pathLength, Node path[])`: Implementa o algoritmo A* para encontrar o caminho mais curto.
 
 ### Função Principal de Limpeza
 
