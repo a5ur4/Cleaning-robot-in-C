@@ -10,24 +10,20 @@
 void white() {
     printf("\033[0;37m");
 }
-
 void red() {
     printf("\033[1;31m");
 }
-
 void purple() {
     printf("\033[0;35m");
 }
-
 void green() {
     printf("\033[0;32m");
 }
-
 void yellow() {
     printf("\033[1;33m");
 }
 
-// Função para imprimir a matriz, agora tudo em uma so função
+// Função para imprimir a matriz, agora tudo em uma só função
 void printMatrix(int matrix[SIZE][SIZE], int x, int y, int startX, int startY) {
     #ifdef _WIN32
         system("cls"); // Faz com que não se acumulem matrizes no terminal
@@ -78,19 +74,19 @@ void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY, int s
 
 // Estrutura para representar uma posição na matriz
 typedef struct {
-    int x, y; // Coordenadas do nó na matriz, os pontos onde tomara como referencia
-    int g, h, f; // Parametros utilizados para a heurística
-} Node; // Nó, representa um ponto ou posição na matriz, cada nó armazena uma informação diferente para a naveção e cálculo
+    int x, y; // Coordenadas do nó na matriz, os pontos onde tomara como referência
+    int g, h, f; // Parâmetros utilizados para a heurística
+} Node; // Nó, representa um ponto ou posição na matriz, cada nó armazena uma informação diferente para a navegação e cálculo
 
-// Função para calcular a heurística, no caso o custo do no atual ate o no objetivo, respectivamente x e y
-// Calculo feito utilizando a distância de Manhatthan, que é a soma das distâncias absolutas das diferenças das coordenadas, não pergunte como isso foi feito, nem mesmo eu sei como isso está funcionado
+// Função para calcular a heurística, no caso o custo do nó atual até o nó objetivo, respectivamente x e y
+// Cálculo feito utilizando a distância de Manhattan, que é a soma das distâncias absolutas das diferenças das coordenadas
 int heuristic(int x1, int y1, int x2, int y2) {
-    return abs(x1 - x2) + abs(y1 - y2); 
+    return abs(x1 - x2) + abs(y1 - y2);
 }
 
 // Função para encontrar o caminho de volta usando A*
-void oppenhaimer(int matrix[SIZE][SIZE], int startX, int startY, int goalX, int goalY, int *pathLength, Node path[]) { // Esta função é o mais proximo de feiticaria que fiz até hojee a maior dor de cabeça que tive em anos
-    int closedList[SIZE][SIZE] = {0}; // Os nós ja limpos são armazenados aqui
+void oppenhaimer(int matrix[SIZE][SIZE], int startX, int startY, int goalX, int goalY, int *pathLength, Node path[]) {
+    int closedList[SIZE][SIZE] = {0}; // Os nós já limpos são armazenados aqui
     Node openList[SIZE * SIZE]; // Os nós são armazenados aqui
     int openListSize = 0;
 
@@ -163,12 +159,14 @@ void oppenhaimer(int matrix[SIZE][SIZE], int startX, int startY, int goalX, int 
             }
         }
     }
-} // Está função é minha tentativa mais desesperada de conseguir fazer esse robô funcionar perfeitamente, possivelmente me arreprenderei dela futuramentem, porém não hoje
+}
 
 // Função para mover o robô de volta para a posição inicial
 void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY) {
     Node path[SIZE * SIZE];
     int pathLength;
+
+    sleep(2); // Mostrar que a função moonWalker iniciou
 
     oppenhaimer(matrix, *x, *y, startX, startY, &pathLength, path);
     for (int i = pathLength - 1; i >= 0; i--) {
@@ -187,21 +185,28 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     // Loop principal para limpar todas as sujeiras do ambiente
     while (1) {
         int targetX = -1, targetY = -1;
+        int searchRadius = 1; // Raio da sujeira
 
-        // Encontra a sujeira mais próxima
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (matrix[i][j] == 1) {
-                    targetX = i;
-                    targetY = j;
-                    break;
+        // Encontra a sujeira mais próxima, e caso não ache aumenta o raio para 2
+        while (targetX == -1 && searchRadius <= 2) {
+            for (int i = -searchRadius; i <= searchRadius; i++) {
+                for (int j = -searchRadius; j <= searchRadius; j++) {
+                    int newX = x + i;
+                    int newY = y + j;
+                    if (isValidMove(newX, newY) && matrix[newX][newY] == 1) { // Verifica a célula vizinha para sujeira
+                        targetX = newX;
+                        targetY = newY;
+                        break;
+                    }
                 }
+                if (targetX != -1) break;
             }
-            if (targetX != -1) break;
+            searchRadius++;
         }
 
         if (targetX == -1) { // Verifica se há sujeira para limpar
-            printf("Todas as sujeiras foram limpas.\n");
+            printf("Todas as sujeiras foram limpas, inicio da funcao moonWalker.\n");
+            moonWalker(matrix, &x, &y, startX, startY); // Movendo o robô de volta à estação de partida seguindo o caminho inverso
             break;
         }
 
@@ -235,8 +240,6 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
         matrix[targetX][targetY] = -1; // Marca a sujeira como limpa
         printf("Sujeira limpa!\n");
     }
-
-    moonWalker(matrix, &x, &y, startX, startY); // Movendo o robô de volta à estação de partida seguindo o caminho inverso
 }
 
 int main() {
