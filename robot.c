@@ -187,9 +187,42 @@ void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY) 
     }
 }
 
+int hasVisitedRecently(int visited[SIZE][SIZE], int x, int y) {
+    return visited[x][y];
+}
+
+void markVisited(int visited[SIZE][SIZE], int x, int y) {
+    visited[x][y] = 1;
+}
+
+int theManWhoSoldTheWorld(int matrix[SIZE][SIZE], int startX, int startY, int endX, int endY) { // Função para calculo para contagem de lixos em um linha coluna e sua procedência
+    int dirtCount = 0;
+    int x = startX;
+    int y = startY;
+
+    // Movimento vertical primeiro
+    while (x != endX) {
+        if (matrix[x][y] == 1) {
+            dirtCount++;
+        }
+        x += (endX > x) ? 1 : -1;
+    }
+
+    // Movimento horizontal depois
+    while (y != endY) {
+        if (matrix[x][y] == 1) {
+            dirtCount++;
+        }
+        y += (endY > y) ? 1 : -1;
+    }
+
+    return dirtCount;
+}
+
 // Função para limpar o ambiente e retornar à posição inicial
 void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     int x = startX, y = startY;
+    int visited[SIZE][SIZE] = {0}; // Array para rastrear células visitadas
     printMatrix(matrix, x, y, startX, startY); // Exibe a matriz inicial com o robô na posição de partida
 
     // Função para contar o número de sujeiras restantes
@@ -256,15 +289,18 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
         while (x != targetX || y != targetY) {
             int nextX = x, nextY = y;
             int minDistance = SIZE * SIZE; // Inicializa com um valor grande
+            int minDirt = SIZE * SIZE; // Inicializa com um valor grande para quantidade de sujeira
 
             for (int i = 0; i < 4; i++) { // Itera sobre as direções para encontrar a direção com a menor distância para a sujeira
                 int newX = x + directions[i][0];
                 int newY = y + directions[i][1];
 
-                if (isValidMove(newX, newY) && matrix[newX][newY] != 0) { // Verifica se o movimento é válido e se não passa por locais com "|----|", que no caso é o 0
+                if (isValidMove(newX, newY) && matrix[newX][newY] != 0 && !hasVisitedRecently(visited, newX, newY)) {
                     int distance = abs(newX - targetX) + abs(newY - targetY);
-                    if (distance < minDistance) {
+                    int dirt = theManWhoSoldTheWorld(matrix, x, y, newX, newY);
+                    if (dirt < minDirt || (dirt == minDirt && distance < minDistance)) {
                         minDistance = distance;
+                        minDirt = dirt;
                         nextX = newX;
                         nextY = newY;
                     }
@@ -276,11 +312,22 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
                 return;
             }
 
-            moveRobot(matrix, &x, &y, nextX - x, nextY - y, startX, startY); // Move o robô para a próxima posição mais próxima da sujeira
+            // Marca a célula atual como visitada
+            markVisited(visited, x, y);
+            // Move o robô para a próxima posição mais próxima da sujeira
+            moveRobot(matrix, &x, &y, nextX - x, nextY - y, startX, startY);
         }
 
-        matrix[targetX][targetY] = -1; // Marca a sujeira como limpa
+        // Marca a sujeira como limpa
+        matrix[targetX][targetY] = -1;
         printf("Sujeira limpa!\n");
+
+        // Reseta a matriz de visitados
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                visited[i][j] = 0;
+            }
+        }
 
         // Volta a enxergar apenas uma célula de distância
         searchRadius = 1;
