@@ -27,7 +27,7 @@ Este projeto implementa um robô de limpeza simulado em C, que se move em uma ma
 Para compilar o programa, use um compilador C. Por exemplo, no terminal do Linux ou no prompt de comando do Windows, navegue até o diretório do projeto e execute:
 
 ```sh
-gcc -o robot robot.c
+gcc -o robot robot.c -lm
 ```
 
 ### Execução
@@ -77,7 +77,9 @@ Funções para definir cores no terminal:
 
 - `int isValidMove(int x, int y)`: Verifica se o movimento é válido dentro da matriz.
 - `void moveRobot(int matrix[SIZE][SIZE], int *x, int *y, int dirX, int dirY, int startX, int startY)`: Move o robô em uma direção específica e atualiza a matriz.
-- `void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY)`: Move o robô de volta à posição inicial usando o algoritmo A* (implementado na função `oppenhaimer`).
+- `int hasVisitedRecently(int visited[SIZE][SIZE], int x, int y)`: Verifica se uma célula foi visitada recentemente.
+- `void markVisited(int visited[SIZE][SIZE], int x, int y)`: Marca uma célula como visitada.
+- `int theManWhoSoldTheWorld(int matrix[SIZE][SIZE], int startX, int startY, int endX, int endY)`: Calcula o número de sujeiras em uma linha/coluna.
 
 ### Estruturas e Funções do Algoritmo A*
 
@@ -90,6 +92,10 @@ Funções para definir cores no terminal:
   ```
 - `int heuristic(int x1, int y1, int x2, int y2)`: Calcula a heurística (distância de Manhattan) entre dois pontos.
 - `void oppenhaimer(int matrix[SIZE][SIZE], int startX, int startY, int goalX, int goalY, int *pathLength, Node path[])`: Implementa o algoritmo A* para encontrar o caminho mais curto.
+
+### Função de Retorno à Posição Inicial
+
+- `void moonWalker(int matrix[SIZE][SIZE], int *x, int *y, int startX, int startY)`: Move o robô de volta à posição inicial utilizando o algoritmo A*.
 
 ### Função Principal de Limpeza
 
