@@ -26,11 +26,20 @@ void yellow() {
 // Função para imprimir a matriz, agora tudo em uma só função
 void printMatrix(int matrix[SIZE][SIZE], int x, int y, int startX, int startY) {
     #ifdef _WIN32
-        system("cls"); // Faz com que não se acumulem matrizes no terminal
+        system("cls"); // Limpa o terminal no Windows
     #else
-        system("clear");
+        system("clear"); // Limpa o terminal em sistemas Unix
     #endif
+
+    printf("   ");
     for (int i = 0; i < SIZE; i++) {
+        printf("  %-5d", i); // Imprime os números da linha superior
+    }
+    printf("\n");
+
+    for (int i = 0; i < SIZE; i++) {
+        printf("%-3d", i); // Imprime o número da coluna à esquerda
+
         for (int j = 0; j < SIZE; j++) {
             if (i == startX && j == startY) {
                 yellow();
@@ -53,6 +62,7 @@ void printMatrix(int matrix[SIZE][SIZE], int x, int y, int startX, int startY) {
     }
     printf("\nFeito por: _a5ur4\n");
 }
+
 
 // Definição das direções prioritárias
 const int directions[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // Direções: cima, baixo, esquerda, direita
@@ -182,6 +192,19 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
     int x = startX, y = startY;
     printMatrix(matrix, x, y, startX, startY); // Exibe a matriz inicial com o robô na posição de partida
 
+    // Função para contar o número de sujeiras restantes
+    int countDirt(int matrix[SIZE][SIZE]) {
+        int dirtCount = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (matrix[i][j] == 1) {
+                    dirtCount++;
+                }
+            }
+        }
+        return dirtCount;
+    }
+
     // Loop principal para limpar todas as sujeiras do ambiente
     while (1) {
         int targetX = -1, targetY = -1;
@@ -205,9 +228,28 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
         }
 
         if (targetX == -1) { // Verifica se há sujeira para limpar
-            printf("Todas as sujeiras foram limpas, inicio da funcao moonWalker.\n");
-            moonWalker(matrix, &x, &y, startX, startY); // Movendo o robô de volta à estação de partida seguindo o caminho inverso
-            break;
+            int dirtCount = countDirt(matrix);
+            if (dirtCount == 0) {
+                printf("Todas as sujeiras foram limpas, inicio da funcao moonWalker.\n");
+                moonWalker(matrix, &x, &y, startX, startY); // Movendo o robô de volta à estação de partida seguindo o caminho inverso
+                break;
+            } else if (dirtCount >= 1) {
+                printf("Restam %d sujeiras, o robo ira verificar a matriz para localizar e limpar.\n", dirtCount);
+                sleep(4);
+                for (int i = 0; i < SIZE; i++) {
+                    for (int j = 0; j < SIZE; j++) {
+                        if (matrix[i][j] == 1) {
+                            targetX = i;
+                            targetY = j;
+                            break;
+                        }
+                    }
+                    if (targetX != -1) break;
+                }
+            } else {
+                printf("Erro inesperado na contagem de sujeira.\n");
+                break;
+            }
         }
 
         // Move para a sujeira mais próxima
@@ -230,7 +272,7 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
             }
 
             if (nextX == x && nextY == y) {
-                printf("O robô não pode alcançar a sujeira restante.\n");
+                printf("O robo nao pode alcancar a sujeira restante.\n");
                 return;
             }
 
@@ -239,6 +281,9 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
 
         matrix[targetX][targetY] = -1; // Marca a sujeira como limpa
         printf("Sujeira limpa!\n");
+
+        // Volta a enxergar apenas uma célula de distância
+        searchRadius = 1;
     }
 }
 
