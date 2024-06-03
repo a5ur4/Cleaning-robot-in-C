@@ -243,8 +243,8 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
         int targetX = -1, targetY = -1;
         int searchRadius = 1; // Raio da sujeira
 
-        // Encontra a sujeira mais próxima, e caso não ache aumenta o raio para 2
-        while (targetX == -1 && searchRadius <= 2) {
+        // Encontra a sujeira mais próxima, e caso não ache aumenta o raio para o tamanho maximo da matriz
+        while (targetX == -1 && searchRadius <= SIZE) {  // Ajuste aqui
             for (int i = -searchRadius; i <= searchRadius; i++) {
                 for (int j = -searchRadius; j <= searchRadius; j++) {
                     int newX = x + i;
@@ -279,9 +279,6 @@ void cleanEnvironment(int matrix[SIZE][SIZE], int startX, int startY) {
                     }
                     if (targetX != -1) break;
                 }
-            } else {
-                printf("Erro inesperado na contagem de sujeira.\n");
-                break;
             }
         }
 
